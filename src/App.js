@@ -1,26 +1,58 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react'
+import api from './services/api'
+import './global.css'
+import './App.css'
+import './Sidebar.css'
+import './Main.css'
+
+import DeveloperItem from './components/DeveloperItem'
+import DeveloperForm from './components/DeveloperForm'
 
 function App() {
+
+  const [developers, setDevelopers] = useState([])
+
+  useEffect(()=>{
+
+    async function loadDevelopers() {
+      const response = await api.get('/developers')     
+
+      setDevelopers(response.data)
+    }
+
+    loadDevelopers()
+
+  }, [])
+
+  async function handleAddDeveloper(data) {
+
+    console.log(data)
+
+    const response = await api.post('/developers', data) 
+
+    console.log(response.data)
+
+    setDevelopers([...developers, response.data])
+  }
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div id="app">
+      <aside>
+        <strong>Cadastrar</strong>
+        <DeveloperForm onSubmit={ handleAddDeveloper } />
+      </aside>
+      <main>
+        <ul>
+          {
+            developers.map( developer => (
+              <DeveloperItem key={developer._id} developer={ developer } />
+            ))
+          } 
+        </ul>
+      </main>
     </div>
-  );
+  )  
 }
 
-export default App;
+export default App
